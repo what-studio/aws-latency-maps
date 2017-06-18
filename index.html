@@ -9,13 +9,13 @@
   <script>
     function getStrokeColor(latency) {
       if (latency < 100) {
-        return 'rgba(0, 255, 0, 1.0)';
+        return '#f03e3e';
       }
       else if (latency < 180) {
-        return 'rgba(255, 255, 0, 1.0)';
+        return '#fab005';
       }
       else {
-        return 'rgba(255, 0, 0, 1.0)';
+        return '#74b816';
       }
     }
 
@@ -105,10 +105,9 @@
       element: document.getElementById('container'),
       width: 1200,
       height: 600,
-      // fills: {
-      //   defaultFill: "#ABDDA4",
-      //   win: '#0fa0fa'
-      // },
+      fills: {
+        defaultFill: "#dee2e6",
+      },
     });
     map.arc(
       $(data).map(function(i, e) {
@@ -135,6 +134,8 @@
 
 </html>
 <!--
+  http://datamaps.github.io/
+  https://yeun.github.io/open-color/
   https://www.cloudping.co/
   https://www.cloudping.co/apidocs/
 
