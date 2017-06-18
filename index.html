@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+  <script src="datamaps.world.hires.min.js"></script>
+  <div id="container" style="position: relative; width: 500px; height: 300px;"></div>
+  <script>
+    function getStrokeColor(latency) {
+      if (latency < 100) {
+        return 'rgba(0, 255, 0, 1.0)';
+      }
+      else if (latency < 180) {
+        return 'rgba(255, 255, 0, 1.0)';
+      }
+      else {
+        return 'rgba(255, 0, 0, 1.0)';
+      }
+    }
+
+    var sampleData = [{"region": "ap-south-1", "averages": [{"average": 3.23, "regionTo": "ap-south-1"}, {"average": 138.43, "regionTo": "eu-west-2"}, {"average": 142.86, "regionTo": "eu-west-1"}, {"average": 181.51, "regionTo": "ap-northeast-2"}, {"average": 147.27, "regionTo": "ap-northeast-1"}, {"average": 325.45, "regionTo": "sa-east-1"}, {"average": 227.85, "regionTo": "ca-central-1"}, {"average": 75.71, "regionTo": "ap-southeast-1"}, {"average": 249.37, "regionTo": "ap-southeast-2"}, {"average": 134.16, "regionTo": "eu-central-1"}, {"average": 202.88, "regionTo": "us-east-1"}, {"average": 227.77, "regionTo": "us-east-2"}, {"average": 265.93, "regionTo": "us-west-1"}, {"average": 249.5, "regionTo": "us-west-2"}]}, {"region": "eu-west-2", "averages": [{"average": 118.13, "regionTo": "ap-south-1"}, {"average": 2.1, "regionTo": "eu-west-2"}, {"average": 20.39, "regionTo": "eu-west-1"}, {"average": 251.57, "regionTo": "ap-northeast-2"}, {"average": 227.28, "regionTo": "ap-northeast-1"}, {"average": 200.53, "regionTo": "sa-east-1"}, {"average": 94.39, "regionTo": "ca-central-1"}, {"average": 172.37, "regionTo": "ap-southeast-1"}, {"average": 298.24, "regionTo": "ap-southeast-2"}, {"average": 21.59, "regionTo": "eu-central-1"}, {"average": 82.99, "regionTo": "us-east-1"}, {"average": 92.19, "regionTo": "us-east-2"}, {"average": 141.69, "regionTo": "us-west-1"}, {"average": 161.37, "regionTo": "us-west-2"}]}, {"region": "eu-west-1", "averages": [{"average": 127.5, "regionTo": "ap-south-1"}, {"average": 20.11, "regionTo": "eu-west-2"}, {"average": 7.33, "regionTo": "eu-west-1"}, {"average": 244.68, "regionTo": "ap-northeast-2"}, {"average": 214.0, "regionTo": "ap-northeast-1"}, {"average": 191.3, "regionTo": "sa-east-1"}, {"average": 87.39, "regionTo": "ca-central-1"}, {"average": 186.26, "regionTo": "ap-southeast-1"}, {"average": 307.36, "regionTo": "ap-southeast-2"}, {"average": 28.75, "regionTo": "eu-central-1"}, {"average": 95.2, "regionTo": "us-east-1"}, {"average": 94.17, "regionTo": "us-east-2"}, {"average": 146.07, "regionTo": "us-west-1"}, {"average": 138.48, "regionTo": "us-west-2"}]}, {"region": "ap-northeast-2", "averages": [{"average": 168.94, "regionTo": "ap-south-1"}, {"average": 266.79, "regionTo": "eu-west-2"}, {"average": 259.19, "regionTo": "eu-west-1"}, {"average": 4.99, "regionTo": "ap-northeast-2"}, {"average": 44.24, "regionTo": "ap-northeast-1"}, {"average": 306.34, "regionTo": "sa-east-1"}, {"average": 191.01, "regionTo": "ca-central-1"}, {"average": 112.4, "regionTo": "ap-southeast-1"}, {"average": 149.08, "regionTo": "ap-southeast-2"}, {"average": 276.92, "regionTo": "eu-central-1"}, {"average": 206.05, "regionTo": "us-east-1"}, {"average": 218.78, "regionTo": "us-east-2"}, {"average": 166.42, "regionTo": "us-west-1"}, {"average": 150.52, "regionTo": "us-west-2"}]}, {"region": "ap-northeast-1", "averages": [{"average": 142.03, "regionTo": "ap-south-1"}, {"average": 262.23, "regionTo": "eu-west-2"}, {"average": 242.34, "regionTo": "eu-west-1"}, {"average": 46.81, "regionTo": "ap-northeast-2"}, {"average": 4.94, "regionTo": "ap-northeast-1"}, {"average": 280.66, "regionTo": "sa-east-1"}, {"average": 167.58, "regionTo": "ca-central-1"}, {"average": 80.68, "regionTo": "ap-southeast-1"}, {"average": 115.41, "regionTo": "ap-southeast-2"}, {"average": 251.02, "regionTo": "eu-central-1"}, {"average": 179.78, "regionTo": "us-east-1"}, {"average": 185.25, "regionTo": "us-east-2"}, {"average": 129.42, "regionTo": "us-west-1"}, {"average": 113.11, "regionTo": "us-west-2"}]}, {"region": "sa-east-1", "averages": [{"average": 342.29, "regionTo": "ap-south-1"}, {"average": 238.19, "regionTo": "eu-west-2"}, {"average": 218.38, "regionTo": "eu-west-1"}, {"average": 331.3, "regionTo": "ap-northeast-2"}, {"average": 288.85, "regionTo": "ap-northeast-1"}, {"average": 4.22, "regionTo": "sa-east-1"}, {"average": 170.54, "regionTo": "ca-central-1"}, {"average": 359.1, "regionTo": "ap-southeast-1"}, {"average": 373.58, "regionTo": "ap-southeast-2"}, {"average": 230.49, "regionTo": "eu-central-1"}, {"average": 141.69, "regionTo": "us-east-1"}, {"average": 188.28, "regionTo": "us-east-2"}, {"average": 219.53, "regionTo": "us-west-1"}, {"average": 203.32, "regionTo": "us-west-2"}]}, {"region": "ca-central-1", "averages": [{"average": 204.55, "regionTo": "ap-south-1"}, {"average": 93.09, "regionTo": "eu-west-2"}, {"average": 90.91, "regionTo": "eu-west-1"}, {"average": 176.83, "regionTo": "ap-northeast-2"}, {"average": 146.54, "regionTo": "ap-northeast-1"}, {"average": 129.22, "regionTo": "sa-east-1"}, {"average": 1.9, "regionTo": "ca-central-1"}, {"average": 220.23, "regionTo": "ap-southeast-1"}, {"average": 236.88, "regionTo": "ap-southeast-2"}, {"average": 106.12, "regionTo": "eu-central-1"}, {"average": 23.43, "regionTo": "us-east-1"}, {"average": 37.09, "regionTo": "us-east-2"}, {"average": 84.17, "regionTo": "us-west-1"}, {"average": 72.16, "regionTo": "us-west-2"}]}, {"region": "ap-southeast-1", "averages": [{"average": 66.84, "regionTo": "ap-south-1"}, {"average": 211.43, "regionTo": "eu-west-2"}, {"average": 223.52, "regionTo": "eu-west-1"}, {"average": 112.38, "regionTo": "ap-northeast-2"}, {"average": 75.95, "regionTo": "ap-northeast-1"}, {"average": 338.81, "regionTo": "sa-east-1"}, {"average": 222.47, "regionTo": "ca-central-1"}, {"average": 5.59, "regionTo": "ap-southeast-1"}, {"average": 178.57, "regionTo": "ap-southeast-2"}, {"average": 186.29, "regionTo": "eu-central-1"}, {"average": 234.15, "regionTo": "us-east-1"}, {"average": 240.6, "regionTo": "us-east-2"}, {"average": 188.64, "regionTo": "us-west-1"}, {"average": 169.18, "regionTo": "us-west-2"}]}, {"region": "ap-southeast-2", "averages": [{"average": 243.7, "regionTo": "ap-south-1"}, {"average": 321.04, "regionTo": "eu-west-2"}, {"average": 323.81, "regionTo": "eu-west-1"}, {"average": 150.95, "regionTo": "ap-northeast-2"}, {"average": 122.25, "regionTo": "ap-northeast-1"}, {"average": 354.36, "regionTo": "sa-east-1"}, {"average": 253.42, "regionTo": "ca-central-1"}, {"average": 182.18, "regionTo": "ap-southeast-1"}, {"average": 8.52, "regionTo": "ap-southeast-2"}, {"average": 335.61, "regionTo": "eu-central-1"}, {"average": 253.76, "regionTo": "us-east-1"}, {"average": 226.85, "regionTo": "us-east-2"}, {"average": 173.75, "regionTo": "us-west-1"}, {"average": 176.1, "regionTo": "us-west-2"}]}, {"region": "eu-central-1", "averages": [{"average": 115.84, "regionTo": "ap-south-1"}, {"average": 21.68, "regionTo": "eu-west-2"}, {"average": 32.14, "regionTo": "eu-west-1"}, {"average": 262.35, "regionTo": "ap-northeast-2"}, {"average": 234.01, "regionTo": "ap-northeast-1"}, {"average": 212.8, "regionTo": "sa-east-1"}, {"average": 107.58, "regionTo": "ca-central-1"}, {"average": 171.22, "regionTo": "ap-southeast-1"}, {"average": 327.52, "regionTo": "ap-southeast-2"}, {"average": 4.67, "regionTo": "eu-central-1"}, {"average": 103.78, "regionTo": "us-east-1"}, {"average": 104.5, "regionTo": "us-east-2"}, {"average": 151.43, "regionTo": "us-west-1"}, {"average": 164.92, "regionTo": "us-west-2"}]}, {"region": "us-east-1", "averages": [{"average": 189.31, "regionTo": "ap-south-1"}, {"average": 83.66, "regionTo": "eu-west-2"}, {"average": 85.81, "regionTo": "eu-west-1"}, {"average": 180.52, "regionTo": "ap-northeast-2"}, {"average": 153.63, "regionTo": "ap-northeast-1"}, {"average": 126.13, "regionTo": "sa-east-1"}, {"average": 19.94, "regionTo": "ca-central-1"}, {"average": 218.31, "regionTo": "ap-southeast-1"}, {"average": 231.09, "regionTo": "ap-southeast-2"}, {"average": 97.0, "regionTo": "eu-central-1"}, {"average": 29.6, "regionTo": "us-east-1"}, {"average": 23.97, "regionTo": "us-east-2"}, {"average": 68.58, "regionTo": "us-west-1"}, {"average": 87.56, "regionTo": "us-west-2"}]}, {"region": "us-east-2", "averages": [{"average": 200.05, "regionTo": "ap-south-1"}, {"average": 96.09, "regionTo": "eu-west-2"}, {"average": 95.74, "regionTo": "eu-west-1"}, {"average": 204.28, "regionTo": "ap-northeast-2"}, {"average": 179.21, "regionTo": "ap-northeast-1"}, {"average": 142.36, "regionTo": "sa-east-1"}, {"average": 33.81, "regionTo": "ca-central-1"}, {"average": 233.46, "regionTo": "ap-southeast-1"}, {"average": 214.53, "regionTo": "ap-southeast-2"}, {"average": 104.18, "regionTo": "eu-central-1"}, {"average": 31.0, "regionTo": "us-east-1"}, {"average": 8.8, "regionTo": "us-east-2"}, {"average": 61.04, "regionTo": "us-west-1"}, {"average": 75.51, "regionTo": "us-west-2"}]}, {"region": "us-west-1", "averages": [{"average": 238.89, "regionTo": "ap-south-1"}, {"average": 144.48, "regionTo": "eu-west-2"}, {"average": 145.05, "regionTo": "eu-west-1"}, {"average": 153.98, "regionTo": "ap-northeast-2"}, {"average": 123.38, "regionTo": "ap-northeast-1"}, {"average": 190.54, "regionTo": "sa-east-1"}, {"average": 82.55, "regionTo": "ca-central-1"}, {"average": 181.86, "regionTo": "ap-southeast-1"}, {"average": 164.38, "regionTo": "ap-southeast-2"}, {"average": 152.44, "regionTo": "eu-central-1"}, {"average": 85.39, "regionTo": "us-east-1"}, {"average": 64.73, "regionTo": "us-east-2"}, {"average": 6.55, "regionTo": "us-west-1"}, {"average": 25.19, "regionTo": "us-west-2"}]}, {"region": "us-west-2", "averages": [{"average": 230.12, "regionTo": "ap-south-1"}, {"average": 168.15, "regionTo": "eu-west-2"}, {"average": 141.64, "regionTo": "eu-west-1"}, {"average": 144.6, "regionTo": "ap-northeast-2"}, {"average": 111.92, "regionTo": "ap-northeast-1"}, {"average": 191.54, "regionTo": "sa-east-1"}, {"average": 78.02, "regionTo": "ca-central-1"}, {"average": 173.16, "regionTo": "ap-southeast-1"}, {"average": 174.5, "regionTo": "ap-southeast-2"}, {"average": 168.69, "regionTo": "eu-central-1"}, {"average": 98.62, "regionTo": "us-east-1"}, {"average": 79.37, "regionTo": "us-east-2"}, {"average": 29.19, "regionTo": "us-west-1"}, {"average": 6.3, "regionTo": "us-west-2"}]}];
+
+    var data = $(sampleData).map(function(i, e) {
+      var xs = $(e.averages).map(function(j, d) {
+        return [[[e.region, d.regionTo, d.average]]];
+      });
+      return Array.prototype.concat.apply([], xs);
+    });
+
+    var aws = {
+      // Tokyo
+      'ap-northeast-1': {
+        latitude: 35.6895,
+        longitude: 139.6917,
+      },
+      // Seoul
+      'ap-northeast-2': {
+        latitude: 37.3665,
+        longitude: 126.9780,
+      },
+      // Mumbai
+      'ap-south-1': {
+        latitude: 19.0760,
+        longitude: 72.8777,
+      },
+      // Singapore
+      'ap-southeast-1': {
+        latitude: 1.3521,
+        longitude: 103.8198,
+      },
+      // Sydney
+      'ap-southeast-2': {
+        latitude: -33.8688,
+        longitude: 151.2093,
+      },
+      // Canada
+      'ca-central-1': {
+        latitude: 56.1304,
+        longitude: -106.3468,
+      },
+      // Frankfurt
+      'eu-central-1': {
+        latitude: 50.1109,
+        longitude: 8.6821,
+      },
+      // Ireland
+      'eu-west-1': {
+        latitude: 53.1424,
+        longitude: -7.6921,
+      },
+      // London
+      'eu-west-2': {
+        latitude: 51.5074,
+        longitude: -0.1278,
+      },
+      // São Paulo
+      'sa-east-1': {
+        latitude: -23.5505,
+        longitude: -46.6333,
+      },
+      // N. Virginia
+      'us-east-1': {
+        latitude: 37.4316,
+        longitude: -78.6569,
+      },
+      // Ohio
+      'us-east-2': {
+        latitude: 40.4173,
+        longitude: -82.9071,
+      },
+      // N. California
+      'us-west-1': {
+        latitude: 36.7783,
+        longitude: -119.4197,
+      },
+      // Oregon
+      'us-west-2': {
+        latitude: 43.8041,
+        longitude: -120.5542,
+      },
+    };
+
+    var map = new Datamap({
+      element: document.getElementById('container'),
+      width: 1200,
+      height: 600,
+      // fills: {
+      //   defaultFill: "#ABDDA4",
+      //   win: '#0fa0fa'
+      // },
+    });
+    map.arc(
+      $(data).map(function(i, e) {
+        return {
+          origin: aws[e[0]],
+          destination: aws[e[1]],
+          options: {
+            strokeColor: getStrokeColor(e[2])
+          }
+        }
+      }),
+      { strokeWidth: 0.75, arcSharpness: 1.8 }
+    );
+  </script>
+
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+</body>
+
+</html>
+<!--
+  https://www.cloudping.co/
+  https://www.cloudping.co/apidocs/
+
+curl 'https://api.cloudping.co/averages/week' -H 'Origin: https://www.cloudping.co' -H 'Accept-Encoding: gzip, deflate, sdch, br' -H 'Accept-Language: en-US,en;q=0.8,ko;q=0.6' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10-12-5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36' -H 'Accept: application/json, text/plain, */*' -H 'Referer: https://www.cloudping.co/' -H 'Connection: keep-alive' --compressed
+
+curl 'https://api.cloudping.co/averages/month' -H 'Origin: https://www.cloudping.co' -H 'Accept-Encoding: gzip, deflate, sdch, br' -H 'Accept-Language: en-US,en;q=0.8,ko;q=0.6' -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10-12-5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36' -H 'Accept: application/json, text/plain, */*' -H 'Referer: https://www.cloudping.co/' -H 'Connection: keep-alive' --compressed
+-->
