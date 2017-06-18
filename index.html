@@ -109,6 +109,17 @@
         defaultFill: "#dee2e6",
       },
     });
+
+    map.bubbles(
+      $(sampleData).map(function(i, e) {
+        return jQuery.extend(aws[e.region], {
+          name: e.region,
+          radius: 10,
+          // TODO: How do we specify a fill color?
+        });
+      })
+    );
+
     map.arc(
       $(data).map(function(i, e) {
         return {
